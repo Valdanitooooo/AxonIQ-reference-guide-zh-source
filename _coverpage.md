@@ -9,4 +9,4 @@
 - Axon Server 企业版提供了高级支持选项，多上下文以及多个节点的集群。
 
 [GitHub](https://github.com/Valdanitooooo/axoniq-zh)
-[Getting Started](#AxonIQ)
+[Getting Started](#/4.4/getting-started/quick-start)
