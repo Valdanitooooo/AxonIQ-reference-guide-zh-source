@@ -1,11 +1,11 @@
-# Testing
+# 测试
 
-The Axon Framework provides a complete test module to help unit test your Axon application. This includes capabilities test your Commands/Events and Sagas. This section of the reference guide intends to cover in detail the capabilities that the Axon Framework provides to help facilitate testing.‌
+Axon框架提供了一个完整的测试模块，可以帮助您对Axon应用程序进行单元测试。这包括测试你的命令/事件和Sagas的功能。参考指南的本节旨在详细介绍Axon Framework提供的有助于测试的功能。
 
-A summary of the various sub-sections is given below.
+各个小节的摘要如下。
 
-| Sub-Section | Purpose |
+| 小节 | 目的 |
 | :--- | :--- |
-| ​[Commands / Events​](commands-events.md) | Capabilities provided by the Axon Framework to test Commands/Events |
-| ​[Sagas​](sagas-1.md) | Capabilities provided by the Axon Framework to test Sagas |
+| ​[命令 / 事件](commands-events.md) | 由Axon框架提供的测试命令/事件的能力 |
+| ​[Sagas​](sagas-1.md) | 由Axon框架提供的测试Sagas的能力 |
 

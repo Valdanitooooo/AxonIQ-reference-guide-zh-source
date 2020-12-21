@@ -1,51 +1,51 @@
 # Sagas
 
-Similar to command handling components, sagas have a clearly defined interface: they only respond to events. On the other hand, sagas often have a notion of time and may interact with other components as part of their event handling process. Axon Framework's test support module contains fixtures that help you write tests for sagas.
+类似于命令处理组件，sagas具有明确定义的界面：它们仅响应事件。另一方面，sagas通常具有时间概念，并且可能在事件处理过程中与其他组件交互。 Axon框架的测试支持模块包含可帮助您编写Sagas测试的fixture。
 
-Each test fixture contains three phases, similar to those of the command handling component fixture described in the previous section.
+每个测试fixture包含三个阶段，类似于前一节中描述的命令处理组件fixture。
 
-* Given certain events \(from certain aggregates\),
-* when an event arrives or time elapses,
-* expect certain behavior or state.
+* 给定某些事件(来自某些聚合)，
+* 当事件发生或时间流逝时，
+* 预期某种行为或状态。
 
-Both the "given" and the "when" phases accept events as part of their interaction. During the "given" phase, all side effects, such as generated commands are ignored, when possible. During the "when" phase, on the other hand, events and commands generated from the saga are recorded and can be verified.
+“given”和“when”阶段都接受事件作为它们交互的一部分。在“given”阶段，如果可能，所有副作用(如生成的命令)都将被忽略。另一方面，在“when”阶段，将记录saga生成的事件和命令，并可以进行验证。
 
-The following code sample shows an example of how the fixtures can be used to test a saga that sends a notification if an invoice is not paid within 30 days:
+下面的代码示例展示了如何使用fixture来测试saga，如果发票在30天内未支付，则会发送通知:
 
 ```java
 FixtureConfiguration<InvoicingSaga> fixture = new SagaTestFixture<>(InvoicingSaga.class);
 fixture.givenAggregate(invoiceId).published(new InvoiceCreatedEvent()) 
        .whenTimeElapses(Duration.ofDays(31)) 
        .expectDispatchedCommandsMatching(Matchers.listWithAllOf(aMarkAsOverdueCommand())); 
-       // or, to match against the payload of a Command Message only 
+       // 或者，仅与命令消息的payload匹配
        .expectDispatchedCommandsMatching(Matchers.payloadsMatching(Matchers.listWithAllOf(aMarkAsOverdueCommand())));
 ```
 
-Sagas can dispatch commands using a callback to be notified of command processing results. Since there is no actual command handling done in tests, the behavior is defined using a `CallbackBehavior` object. This object is registered using `setCallbackBehavior()` on the fixture and defines if and how the callback must be invoked when a command is dispatched.
+Sagas可以使用回调发送命令，以便通知命令处理结果。由于在测试中没有实际的命令处理，行为是使用`CallbackBehavior`对象定义的。该对象在fixture上使用`setCallbackBehavior()`注册，并定义在发送命令时是否以及如何必须调用回调。
 
-Instead of using a `CommandBus` directly, you can also use command gateways. See below on how to specify their behavior.
+除了直接使用`CommandBus`，您还可以使用命令网关。请参阅下面如何指定它们的行为。
 
-Often, sagas will interact with resources. These resources aren't part of the saga its state, but are injected after a saga is loaded or created. The test fixtures allow you to register resources that need to be injected in the saga. To register a resource, simply invoke the `fixture.registerResource(Object)` method with the resource as parameter. The fixture will detect appropriate setter methods or fields \(annotated with `@Inject`\) on the saga and invoke it with an available resource.
+通常，sagas会与资源进行交互。这些资源不是saga状态的一部分，而是在saga加载或创建后注入的。测试装置允许您注册saga中需要注入的资源。要注册一个资源，只需以资源作为参数调用`fixure.registerResource(Object)`方法。该fixture将检测saga上适当的setter方法或字段(带有`@Inject`注解)，并使用可用资源调用它。
 
-> **Tip**
+> **提示**
 >
-> It can be very useful to inject mock objects \(e.g. Mockito or Easymock\) into your Saga. It allows you to verify that the saga interacts correctly with your external resources.
+> 它可以非常有用的注入模拟对象(例如。Mockito或Easymock)进入您的Saga。它允许您验证saga与您的外部资源是否正确交互。
 
-Command gateways provide sagas with an easier way to dispatch Commands. Using a custom command gateway also makes it easier to create a mock or stub to define its behavior in tests. When providing a mock or stub, however, the actual command might not be dispatched, making it impossible to verify the sent commands in the test fixture.
+命令网关为sagas提供了一种更简单的调度命令的方法。使用自定义命令网关还可以更容易地创建模拟或存根来定义其在测试中的行为。然而，在提供模拟或存根时，实际的命令可能不会被发送，从而无法在测试fixture中验证发送的命令。
 
-Therefore, the fixture provides two methods that allow you to register Command Gateways and optionally a mock defining its behavior: `registerCommandGateway(Class)` and `registerCommandGateway(Class, Object)`. Both methods return an instance of the given class that represents the gateway to use. This instance is also registered as a resource, to make it eligible for resource injection.
+因此，fixture提供了两个方法，允许您注册命令网关和可选的定义其行为的模拟: `registerCommandGateway(Class)`和`registerCommandGateway(Class, Object)`。两个方法都返回给定类的一个实例，该类表示要使用的网关。这个实例也被注册为资源，以使其符合资源注入的条件。
 
-When the `registerCommandGateway(Class)` is used to register a gateway, it dispatches Commands to the CommandBus managed by the fixture. The behavior of the gateway is mostly defined by the `CallbackBehavior` defined on the fixture. If no explicit `CallbackBehavior` is provided, callbacks are not invoked, making it impossible to provide any return value for the gateway.
+当`registerCommandGateway(Class)`被用来注册网关时，它会将命令发送给由fixture管理的CommandBus。网关的行为主要由设备上定义的`CallbackBehavior`定义。如果没有提供显式的`CallbackBehavior`，回调函数将不会被调用，这使得它不可能为网关提供任何返回值。
 
-When the `registerCommandGateway(Class, Object)` is used to register a gateway, the second parameter is used to define the behavior of the gateway.
+当`registerCommandGateway(Class, Object)`被用来注册网关时，第二个参数被用来定义网关的行为。
 
-The test fixture tries to eliminate elapsing system time where possible. This means that it will appear that no time elapses while the test executes, unless you explicitly state so using `whenTimeElapses()`. All events will have the timestamp of the moment the test fixture was created.
+测试治具试图消除可能的系统时间浪费。
+测试fixture试图消除可能的系统时间浪费。这意味着在执行测试时，它看起来没有时间浪费，除非您使用`whenTimeElapses()`显式地声明。所有事件都将具有测试fixture创建时的时间戳。
 
-Having the time stopped during the test makes it easier to predict at what time events are scheduled for publication. If your test case verifies that an event is scheduled for publication in 30 seconds, it will remain 30 seconds, regardless of the time taken between actual scheduling and test execution.
+在测试期间停止时间可以更容易预测将在什么时间发布事件。如果您的测试用例验证了某个事件计划在30秒内发布，则该事件将保留30秒，无论实际调度和测试执行之间花费了多长时间。
 
-> **Note**
+> **注意**
 >
-> The fixture uses a `StubScheduler` for time based activity, such as scheduling events and advancing time. Fixtures will set the timestamp of any events sent to the Saga instance to the time of this scheduler. This means time is 'stopped' as soon as the fixture starts, and may be advanced deterministically using the `whenTimeAdvanceTo` and `whenTimeElapses` methods.
+> fixture为基于时间的活动使用`StubScheduler`，例如调度事件和推进时间。fixture将发送到Saga实例的任何事件的时间戳设置为该调度程序的时间。这意味着时间在fixture启动时就被“停止”了，并且可以使用`whenTimeAdvanceTo`和`whenTimeElapses`方法显式地提前。
 
-You can also use the `StubEventScheduler` independently of the test fixtures if you need to test scheduling of events. This `EventScheduler` implementation allows you to verify which events are scheduled for which time and gives you options to manipulate the progress of time. You can either advance time with a specific `Duration`, move the clock to a specific date and time or advance time to the next scheduled event. All these operations will return the events scheduled within the progressed interval.
-
+如果需要测试事件调度，也可以独立于测试fixture使用`StubEventScheduler`。此`EventScheduler`实现允许您验证在哪个时间安排哪些事件，并提供操作时间进度的选项。您可以使用指定的`Duration`提前时间，将时钟移动到特定的日期和时间，或者将时间提前到下一个计划的事件。所有这些操作都将返回进度间隔内计划的事件。
