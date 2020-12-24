@@ -16,13 +16,13 @@ CQRS的好处之一，尤其是事件源的好处之一是可以纯粹根据事�
 * 执行此命令时，
 * 预计这些事件将被发布和/或存储
 
-Axon Framework提供了一个测试fixture，可让您精确地执行此操作。 `AggregateTestFixture`允许您配置由必要的命令处理程序和存储库组成的特定基础结构，并根据“given-when-then”事件和命令来表达方案。
+Axon Framework提供了一个测试fixture，可让您精确地执行此操作。 `AggregateTestFixture`允许您配置由必要的命令处理程序和存储库组成的特定基础结构，并根据"given-when-then"事件和命令来表达方案。
 
-> **测试 Fixtur 的重点**
+> **测试 Fixture 的重点**
 >
 > 由于此处的测试单元是聚合，因此`AggregateTestFixture`仅用于测试一个聚合。因此，`when` \(或 `given`\)子句中的所有命令都旨在针对测试fixture下的聚合。同样，所有`given`和`expected`的事件都应从测试fixture下的聚合中触发。
 
-下面的示例显示了`GiftCard`集合\([如前面所述](../axon-framework-commands/modeling/aggregate.md#basic-aggregate-structure)\)上的JUnit 4与“given-when-then”测试fixture的用法：
+下面的示例显示了`GiftCard`集合\([如前面所述](../axon-framework-commands/modeling/aggregate.md#basic-aggregate-structure)\)上的JUnit 4与"given-when-then"测试fixture的用法：
 
 ```java
 import org.axonframework.test.aggregate.AggregateTestFixture;
@@ -59,7 +59,7 @@ public class GiftCardTest {
 }
 ```
 
-“given-when-then”测试fixture定义了三个阶段：配置，执行和验证。这些阶段的每个阶段均由不同的接口表示：分别为`FixtureConfiguration`，`TestExecutor`和`ResultValidator`。
+"given-when-then"测试fixture定义了三个阶段：配置，执行和验证。这些阶段的每个阶段均由不同的接口表示：分别为`FixtureConfiguration`，`TestExecutor`和`ResultValidator`。
 
 > **Fluent 接口**
 >
@@ -67,7 +67,7 @@ public class GiftCardTest {
 
 ### 测试设置
 
-在配置阶段（即在提供第一个“given”之前），要提供执行测试所需的构件。默认情况下，事件总线，命令总线和事件存储的特殊版本作为fixture的一部分提供。有适当的访问器方法可获取对它们的引用。任何未直接在聚合上注册的命令处理程序都需要使用`registerAnnotatedCommandHandler`方法进行显式配置。除了带注解的命令处理程序之外，您还可以注册各种组件和设置，这些组件和设置定义应如何设置围绕聚合测试的基础结构，包括以下内容：
+在配置阶段（即在提供第一个"given"之前），要提供执行测试所需的构件。默认情况下，事件总线，命令总线和事件存储的特殊版本作为fixture的一部分提供。有适当的访问器方法可获取对它们的引用。任何未直接在聚合上注册的命令处理程序都需要使用`registerAnnotatedCommandHandler`方法进行显式配置。除了带注解的命令处理程序之外，您还可以注册各种组件和设置，这些组件和设置定义应如何设置围绕聚合测试的基础结构，包括以下内容：
 
 * `registerRepository`:
 
@@ -117,7 +117,7 @@ public class GiftCardTest {
 
 * `registerFieldFilter`:
 
-  注册在“then”阶段中比较对象时使用的`Field`过滤器。
+  注册在"then"阶段中比较对象时使用的`Field`过滤器。
 
 * `registerIgnoredField`:
 
@@ -137,11 +137,11 @@ public class GiftCardTest {
 
   将`CommandTargetResolver`注册到测试fixture。
 
-一旦配置了fixture，就可以定义“given”事件。测试fixture会将这些事件包装为`DomainEventMessages`。如果“given”事件实现了`Message`，则该消息的payload和元数据将包含在`DomainEventMessage`中，否则将给定事件用作。 DomainEventMessage的序列号是连续的，从0开始。如果不需要先前的活动，则可以将`namedNoPriorActivity()`用作起点。
+一旦配置了fixture，就可以定义"given"事件。测试fixture会将这些事件包装为`DomainEventMessages`。如果"given"事件实现了`Message`，则该消息的payload和元数据将包含在`DomainEventMessage`中，否则将给定事件用作。 DomainEventMessage的序列号是连续的，从0开始。如果不需要先前的活动，则可以将`namedNoPriorActivity()`用作起点。
 
-或者，您也可以提供“given”方案的命令。在这种情况下，由这些命令生成的事件将在执行实际的被测命令时用作集合的来源。使用 "`givenCommands(...)`" 方法提供命令对象。
+或者，您也可以提供"given"方案的命令。在这种情况下，由这些命令生成的事件将在执行实际的被测命令时用作集合的来源。使用 "`givenCommands(...)`" 方法提供命令对象。
 
-“given”阶段的最后一个选项是直接提供聚合状态。不建议在事件源的情况下使用此方法，仅在无法根据命令或事件重建聚合或使用[状态存储聚合](../axon-framework-commands/modeling/state-stored-aggregates.md)的情况下才建议这样做。使用`fixture.givenState(() -> new GiftCard())`定义初始状态。
+"given"阶段的最后一个选项是直接提供聚合状态。不建议在事件源的情况下使用此方法，仅在无法根据命令或事件重建聚合或使用[状态存储聚合](../axon-framework-commands/modeling/state-stored-aggregates.md)的情况下才建议这样做。使用`fixture.givenState(() -> new GiftCard())`定义初始状态。
 
 ### 测试执行阶段
 
@@ -149,11 +149,11 @@ public class GiftCardTest {
 
 其次，可以使用`whenThenTimeElapses(Duration)`和`whennnTimeAdvancesTo(Instant)`处理一定的时间跨度。这些支持测试`DeadlineMessages`的发布，[这](../deadlines/)将在本章中进一步定义。
 
-注意，只有在测试执行阶段发生的活动才会被监控。验证阶段不考虑“given”阶段产生的任何事件或副作用。
+注意，只有在测试执行阶段发生的活动才会被监控。验证阶段不考虑"given"阶段产生的任何事件或副作用。
 
 > **非法状态变化检测**
 >
-> 在测试执行期间，Axon尝试检测被测聚合中的任何非法状态更改。它通过将命令执行后的聚合状态与来自所有“given”和存储事件的聚合状态进行比较来实现这一点。如果该状态不相同，则表示状态更改发生在聚合的事件处理程序方法之外。静态和临时字段在比较中被忽略，因为它们通常包含对资源的引用。
+> 在测试执行期间，Axon尝试检测被测聚合中的任何非法状态更改。它通过将命令执行后的聚合状态与来自所有"given"和存储事件的聚合状态进行比较来实现这一点。如果该状态不相同，则表示状态更改发生在聚合的事件处理程序方法之外。静态和临时字段在比较中被忽略，因为它们通常包含对资源的引用。
 >
 > 您可以使用`setReportIllegalStateChange()`方法在fixture的配置中切换检测。
 
@@ -212,7 +212,7 @@ The other component is validation of published events. There are two ways of mat
 
 第一种方法是传入需要与实际事件进行字面值比较的事件实例。将预期事件的所有属性与其在实际事件中的对应项进行比较(使用`equals()`)。如果其中一个属性不相等，则测试将失败，并生成大量错误报告。
 
-表达预期的另一种方式是使用“Matchers”（由Hamcrest库提供）。`Matcher`是一个接口，它规定了两个方法：`matches(Object)`和`describeTo(Description)`。第一个返回一个布尔值来指示匹配器是否匹配。第二种可以让你表达你的预期。例如，“GreaterThanTwoMatcher”可以将“值大于2的任何事件”附加到描述中。描述允许创建关于测试用例失败原因的表达性错误消息。
+表达预期的另一种方式是使用"Matchers"（由Hamcrest库提供）。`Matcher`是一个接口，它规定了两个方法：`matches(Object)`和`describeTo(Description)`。第一个返回一个布尔值来指示匹配器是否匹配。第二种可以让你表达你的预期。例如，"GreaterThanTwoMatcher"可以将"值大于2的任何事件"附加到描述中。描述允许创建关于测试用例失败原因的表达性错误消息。
 
 为事件列表创建匹配器是一项乏味且容易出错的工作。为了简化操作，Axon提供了一组匹配器，允许您提供一组特定于事件的匹配器，并告诉Axon它们应该如何与列表匹配。这些匹配器通过抽象的`Matchers`实用程序类静态获得。
 
@@ -232,13 +232,13 @@ The other component is validation of published events. There are two ways of mat
 
 * **事件序列**: `Matchers.sequenceOf(event matchers...)`
   
-  使用此匹配器验证实际事件与提供的事件匹配程序的顺序是否相同。如果每个匹配器匹配前一个匹配器所匹配的事件之后的事件，则它将成功。这意味着可能会出现不匹配事件的“间隔”。
+  使用此匹配器验证实际事件与提供的事件匹配程序的顺序是否相同。如果每个匹配器匹配前一个匹配器所匹配的事件之后的事件，则它将成功。这意味着可能会出现不匹配事件的"间隔"。
 
-  如果在评估事件之后，有更多的匹配器可用，那么它们都将根据“`null`”进行匹配。这由事件匹配器决定他们是否接受。
+  如果在评估事件之后，有更多的匹配器可用，那么它们都将根据"`null`"进行匹配。这由事件匹配器决定他们是否接受。
 
 * **事件的确切顺序**: `Matchers.exactSequenceOf(event matchers...)`
 
-  “事件序列”匹配器的变体，不允许出现不匹配事件的间隔。
+  "事件序列"匹配器的变体，不允许出现不匹配事件的间隔。
 
   这意味着每个匹配器都必须在先前匹配器所匹配的事件之后直接与该事件匹配。
 
@@ -280,7 +280,7 @@ The other component is validation of published events. There are two ways of mat
 
   payloads匹配匹配器通常用作外部匹配器，以防止payload匹配器重复。
 
-下面是显示这些匹配器用法的一个代码示例。在此示例中，我们预计将发布两个事件。第一个事件必须是“ThirdEvent”，第二个事件必须是“ aFourthEventWithSomeSpecialThings”。可能没有第三事件，因为这将对“andNoMore”匹配器失败。
+下面是显示这些匹配器用法的一个代码示例。在此示例中，我们预计将发布两个事件。第一个事件必须是"ThirdEvent"，第二个事件必须是" aFourthEventWithSomeSpecialThings"。可能没有第三事件，因为这将对"andNoMore"匹配器失败。
 
 ```java
 import org.axonframework.test.aggregate.FixtureConfiguration;
