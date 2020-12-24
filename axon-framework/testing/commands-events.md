@@ -10,7 +10,6 @@ CQRS的好处之一，尤其是事件源的好处之一是可以纯粹根据事�
 
 命令处理组件通常是任何基于CQRS的架构中包含最复杂的组件。比其他组件更为复杂，这也意味着此组件还有与测试相关的额外要求。
 
-Although being more complex, the API of a command handling component is fairly easy. It has a command coming in, and events going out. In some cases, there might be a query as part of command execution. Other than that, commands and events are the only part of the API. This means that it is possible to completely define a test scenario in terms of events and commands. Typically, in the shape of:
 尽管更为复杂，但命令处理组件的API相当简单。 它有一个命令传入，事件消亡。 在某些情况下，命令执行中可能会有一个查询。 除此之外，命令和事件是API的唯一组成部分。 这意味着可以根据事件和命令完全定义测试方案。 通常，形式为：
 
 * 鉴于过去的某些事件，
