@@ -22,7 +22,7 @@ Axon Framework提供了一个测试fixture，可让您精确地执行此操作�
 >
 > 由于此处的测试单元是聚合，因此`AggregateTestFixture`仅用于测试一个聚合。因此，`when` \(或 `given`\)子句中的所有命令都旨在针对测试fixture下的聚合。同样，所有`given`和`expected`的事件都应从测试fixture下的聚合中触发。
 
-下面的示例显示了`GiftCard`集合\([如前面所述](../axon-framework-commands/modeling/aggregate.md#basic-aggregate-structure)\)上的JUnit 4与"given-when-then"测试fixture的用法：
+下面的示例显示了`GiftCard`集合([如前面所述](../axon-framework-commands/modeling/aggregate.md#basic-aggregate-structure))上的JUnit 4与"given-when-then"测试fixture的用法：
 
 ```java
 import org.axonframework.test.aggregate.AggregateTestFixture;
