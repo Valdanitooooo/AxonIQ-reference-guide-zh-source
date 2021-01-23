@@ -1,82 +1,80 @@
 # Architecture Overview
 
-Axon based applications follow an architectural pattern which is based on the principles of Domain-Driven Design \(DDD\), Command Query Responsibility Segregation \(CQRS\) and Event-Driven Architecture \(EDA\). The combination of these principles make Axon based applications more robust and adaptable to accommodate change required by the changes in our business domain.
+基于Axon的应用程序遵循一种基于领域驱动设计\(DDD\)原理的架构模式, 命令查询责任隔离(CQRS)和事件驱动架构 \(EDA\)。这些原则的结合使基于Axon的应用程序更加健壮并且适应性强，可以适应我们业务领域的变化而变化。
 
-Axon finds its use in both large monolithic applications, wherein the internal structure is essential to keep the monolith adaptable, as well as microservices, where the distributed nature of the system adds complexity.
+Axon既可用于大型单体应用，也可用于内部整体结构，以保持整体的适应性；而微服务则可用于系统的分布式特性，从而增加了复杂性。
 
-The following sections describe how the different principles relate and how Axon uses these principles to help you build more maintainable, performant and reliable software.
+以下各节描述了不同原理之间的关系以及Axon如何使用这些原理来帮助您构建更易维护，性能更高且更可靠的软件。
+## 处理复杂性
 
-## Dealing with complexity
+Axon源于试图为不断增加的意外复杂性找到解决方案。应用领域驱动设计中的概念将在很大程度上有所帮助，即使设计最出色的模型也无法在生产中自行运行。
 
-Axon originated in an attempt to find a solution to the ever-increasing accidental complexity. Applying concepts from Domain-Driven Design will help to a very large degree, even the most well-designed model will not run by itself in production.
-
-While Axon is opinionated on how the interaction with a domain model should take place, it tries to avoid any restrictions on the modelling freedom that one has. Even when your opinion differs from that of Axon, there are enough hooks, configuration options and triggers to change certain aspects of Axon's behavior. You will find those throughout the reference guide.
-
+虽然Axon对如何与领域模型进行交互持不同观点，但它努力避免对建模自由的任何限制。
+即使你的观点与Axon不同，也有足够的hooks、配置选项和触发器来改变Axon行为的某些方面。你可以在参考指南中找到这些。
 ### DDD & CQRS
 
-Domain-Driven Design \(DDD\) describes an approach to building software that puts a lot of emphasis on the design of a model, leveraging the use of ubiquitous language . The domain model is the heart of software, and should correctly capture and deal with the essential complexity of the domain.
+领域驱动设计\(DDD\)描述了一种构建软件的方法，该方法非常重视模型的设计，并使用常见的语言。领域模型是软件的心脏，应该正确地捕捉和处理领域的基本复杂性。
 
-Command Query Responsibility Segregation \(CQRS\) is an architectural pattern that describes the distinction between the parts of an application that deals with Commands \(requests to change an application's state\) and those that answer Queries \(requests for information about the application's state\).
+命令查询责任隔离\(CQRS\)是一种架构模式，它描述了应用程序中处理命令\(请求更改应用程序状态\)的部分与回答查询\(请求有关应用程序状态的信息\)的部分之间的区别。
 
-When combining DDD and CQRS, one divides an application into components, where each component either provides information about the application's state, or that changes the application's state. Each of these components have a model that focuses on these responsibilities.
+当组合DDD和CQRS时，将应用程序划分为多个组件，其中每个组件要么提供有关应用程序状态的信息，要么改变应用程序状态。每个组件都有侧重于这些职责的模型。
 
-The image below shows a typical architecture of an Axon based application.
+下图显示了基于Axon的应用程序的典型架构。
 
 ![Architecture overview of a CQRS based Axon application](../.gitbook/assets/architecture-overview.png)
 
-In such an architecture, a UI \(or API\) can send commands to request to change an application's state. These Commands are handled by a Command Handling component, which uses a model to validate the command and make decisions on which side-effects to trigger \(if any\).
+在这样的架构中，UI\(或API\)可以发送命令请求更改应用程序的状态。这些命令由命令处理组件处理，组件使用模型来验证命令并决定触发\(如果有\)的副作用。
 
-The side-effects caused by Commands are published using Events. These Events are picked up by one or more Event Handling components that take the appropriate action. A typical action is updating the view models, which allow the UI to render the application's state. Other actions could be sending messages to external components, or even triggering other side-effects through new commands.
+命令引起的副作用是使用事件发布的。这些事件由采取适当操作的一个或多个事件处理组件拾取。一个典型的操作是更新视图模型，它允许UI呈现应用程序的状态。其他操作可以是向外部组件发送消息，甚至通过新命令触发其他副作用。
 
-The separation of the Command Model and the Query Models \(also called View Models or Projections\) allows these models to only focus on that specific aspect of the application. This makes each individual model easier to comprehend, and therefore more maintainable in the long term.
+命令模型和查询模型\(也称为视图模型或投影\)的分离允许这些模型只关注应用程序的特定方面。这使得每个单独的模型更容易理解，因此更易于长期维护。
 
-### Separation of business logic and infrastructure
+### 业务逻辑和基础结构的分离
 
-An increase in accidental complexity is often caused by leaky abstractions where infrastructure concerns are mixed with business logic. Axon makes it a top priority to keep the two strictly separated. Everywhere in Axon's design, it makes a clear distinction between _what_ you want to do \(e.g. publish an event\) and _how_ that is actually done \(e.g. event publication implementation\).
+意外复杂性的增加通常是基础架构关注点与业务逻辑混合的抽象漏洞造成的。Axon的首要任务是将二者严格分离。在Axon的设计中，每一处都明确区分了“你想做什么”(例如，发布一个事件)和“实际如何做”(例如，事件发布实现)。
 
-This makes Axon extremely configurable and adaptable to your specific situation. More importantly, it keeps accidental complexity to a minimum. For example, while Axon makes it easy to implement Event Sourced Aggregates, by no means does it enforce the aggregate to be Event Sourced. The Repository interface abstracts this decision entirely. Also, a component that decides to send a Command via a Command Bus, is in no way responsible for deciding how that message is transported to the handler.
+这使得Axon易于配置和适应具体情况。更重要的是，它将偶然的复杂性保持在最低限度。例如，虽然Axon让实现事件源聚合变得容易，但它绝不强制聚合为事件源。Repository接口完全抽象了这个决策。另外，决定通过命令总线发送命令的组件不负责决定如何将消息传输到处理程序。
 
-Axon doesn't only make this separation by providing clear interfaces to components, it also combines the infrastructural choices in the Configuration API, there business logic components are configured separately from the infrastructural aspects of your application.
+Axon不仅通过向组件提供清晰的接口来实现这种分离，它还结合了配置API中的基础架构选择，业务逻辑组件是与应用程序的基础架构方面分开配置的。
 
-## Explicit Messaging
+## 显式消息
 
-Axon strongly leverages the use of explicit message objects. This means that each Message in an Axon based application will generally be represented by a specific Java Class in that application. While this does create a little overhead in writing an Axon based application, it does come with a few advantages:
+Axon坚决地利用显式消息对象的使用。这意味着基于Axon的应用程序中的每条消息通常由该应用程序中的特定Java类表示。虽然这会在编写基于Axon的应用程序时产生一些开销，但它确实有一些优点：
 
-* The use of explicit messages makes it easier to transparently distribute them to remote components;
-* The use of explicit messages puts an emphasis on message design, which has proven important in the long-term maintainability of an application;
-* Explicit messages can be easily stored for later processing
+* 显式消息的使用使得透明地发布到远程组件更加容易；
+* 显式消息的使用将重点放在消息设计上，这在应用程序的长期可维护性中被证明是重要的；
+* 显式消息可以很容易地存储起来供以后处理
 
-While Messaging is a core concept in Axon, not all Messages are created equal. Different intents require different routing patterns. For example, for certain message, one would expect a result while others are inherently fire-and-forget.
+虽然消息传递是Axon的核心概念，但并非所有消息都是平等的。不同的意图需要不同的路由模式。例如，对于某条消息，一个人期望得到一个结果，而另一个人则天生就很容易忘记。
 
-Axon separates Messages in roughly three categories:
+Axon将消息分为三类：
 
-* **Commands**; express the intent to change the application's state. Commands are routed to a single destination and may provide a response.
-* **Queries**; express the desire for information. Depending on the dispatch strategy, Queries may be routed to one or more destinations simultaneously.
-* **Events**; represent a notification that something relevant has happened. Events are published to any component interested and do not provide any form of return value.
+* **Commands**; 表示更改应用程序状态的意图。命令被路由到单个目的地，并且可以提供响应。
+* **Queries**; 表达对信息的渴望。根据调度策略，查询可以同时路由到一个或多个目的地。
+* **Events**; 表示已发生相关事件的通知。事件被发布到任何感兴趣的组件，并且不提供任何形式的返回值。
 
-### Location transparency
+### 位置透明
 
-The biggest benefit of using explicit Messages, is that components that interact with each other don't need to know the location of their counterpart. In fact, in most cases, the sending component isn't even interested in the actual destination of a message. We call this "Location Transparency".
+使用显式消息的最大好处是，相互交互的组件不需要知道对方的位置。事实上，在大多数情况下，发送组件甚至对消息的实际目的地都不感兴趣。我们称之为"位置透明"。
 
-Axon takes location transparency further than placing services behind a logical URL. In Axon, a component that sends a message does not need to specify a destination for that message. Messages are routed based on their stereotype \(Command, Query or Event\) and the type of payload that they carry. Axon uses an application's capabilities to find a suitable destination for a message automatically.
+Axon比将服务放在逻辑URL后面更具有位置透明性。在Axon中，发送消息的组件不需要为该消息指定目的地。消息的路由基于它们的原型(命令、查询或事件)和它们所携带的数据类型。Axon使用应用程序的功能自动为消息找到合适的目的地。
 
-A system built up of Location Transparent components makes that system highly adaptable. For example, a monolithic system built out of well-separated components that communicate solely using Commands, Events and Queries, can be easily split into separately deployed units, without any impact on functionality.
+由位置透明组件组成的系统使该系统具有很强的适应性。例如，由单独使用命令、事件和查询进行通信的分离良好的组件构建的单体系统可以轻松地拆分为单独部署的单元，而不会对功能产生任何影响。
 
 ![Microservices Evolution through Location Transparency](../.gitbook/assets/location-transparency.png)
 
-This makes Axon highly suitable for Microservices environments. Logic can be easily moved from, to, and in-between deployed components without impact on the functional aspects of the system as a whole. The location of logic can then be primarily decided upon based on the non-functional requirements of each individual component of that system. Components that have clearly different performance characteristics, or components that require a different release cycle, could, for example, be split out of a monolithic application to reduce the impact of changes to this component.
+这使得Axon非常适合微服务环境。逻辑可以很容易地在部署的组件之间移动，而不会影响整个系统的功能方面。然后，逻辑的位置可以主要根据该系统每个单独组件的非功能性需求来决定。例如，可以将具有明显不同性能特征的组件或需要不同发布周期的组件从单体应用程序中分离出来，以减少更改对该组件的影响。
 
-### Event Sourcing
+### 事件溯源
 
-In many systems, events are given a lot of extra attention. While Axon clearly acknowledges that not every message is an Event \(there are also Commands and Queries\), there is something special about events.
+在许多系统中，事件得到更多的关注。虽然Axon清楚地认识到并非每个消息都是事件(还有命令和查询)，但事件有其特殊之处。
 
-Events retain value. Where the value of Commands and Queries reduce significantly when they have triggered their side-effects or provided their results, Events represent something that has happened, which may be useful to know for a long time after the occurrence of the event.
+事件保留价值。当命令和查询触发了副作用或提供了结果时，其价值会显著降低，而事件表示已经发生的事情，有利于了解在很长一段时间内发生的事情。
 
-Events provide a very good level of granularity for an audit trail. However, for an audit trail to be 100% reliable it should not only be generated as a side-effect, one must also be able to ensure any decisions are correctly reflected by the audit trail.
+事件为审计跟踪提供了非常好的粒度级别。但是，要使审计跟踪具有100％的可靠性，它不仅应作为副作用而产生，而且还必须能够确保审计跟踪正确反映了所有决策。
 
-Event Sourcing is the process where Events are not only generated as the side-effects of a Command, but also form the source of the state. While the current state of the application isn't explicitly stored in the database, it is implicitly stored as a series of events which can be used to derive the current state. On receipt of a Command the state of the application is dynamically derived from the events stored in the database and then decides which side-effects to apply.
+事件溯源是这样一个过程：事件不仅作为命令的副作用生成，而且还形成状态的源。虽然应用程序的当前状态没有显式存储在数据库中，但它隐式地存储为一系列事件，这些事件可用于演变出当前状态。收到命令后，应用程序的状态将从数据库中存储的事件动态演变，然后决定应用哪些副作用。
 
-Event Sourcing can be immensely complex to implement yourself. Axon provides the APIs necessary to make it very easy and even a more natural approach to building a command model. Axon's test fixtures help ensure that certain guidelines and requirements are properly followed.
+事件溯源要自己实现可能非常复杂。Axon提供了必要的api，使得构建命令模型非常简单，甚至更自然。Axon的测试夹具有助于确保某些准则和要求得到适当遵守。
 
-Having a reliable audit trail has not only proven useful for auditability of a system, it also provides the information necessary to build new view models, do data analysis and provide a solid basis for machine learning algorithms.
-
+拥有可靠的审计线索不仅对系统的可审计性有帮助，而且为建立新的视图模型、进行数据分析提供了必要的信息，为机器学习算法提供了坚实的基础。

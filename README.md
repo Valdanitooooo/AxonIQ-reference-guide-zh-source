@@ -17,7 +17,6 @@ Axon提供了Axon Framework和Axon Server来构建基于三个核心概念的应
 | [Axon Framework](axon-framework/introduction.md) | 详细介绍了基于Axon Framework的应用程序的构建 |
 | [Axon Server](axon-server/introduction.md) | 详细介绍了Axon Server(SE/EE)的安装/设置和维护 |
 | [Axon Framework Extensions](release-notes/axon-framework-extensions.md) | 详细介绍了Axon Framework为与现有企业基础设施集成而提供的扩展 |
-
 ## License\(s\)
 
 Axon平台由Axon Framework和Axon Server组成。它由AxonIQ B.V.根据以下许可提供。
