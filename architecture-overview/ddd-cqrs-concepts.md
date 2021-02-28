@@ -1,85 +1,83 @@
-# DDD & CQRS Concepts
+# DDD & CQRS 概念
 
-Axon is heavily based on the principles of Domain-Driven Design \(DDD\) and Command Query Responsibility Segregation. While a full explanation of these concepts is beyond the scope and intent of this reference guide, we do want to provide a summary of the most important concepts in the context of an Axon application.
+Axon主要基于域驱动设计(DDD)和命令查询责任分离的原则。虽然对这些概念的完整解释超出了本参考指南的范围和意图，但我们确实希望在Axon应用程序的上下文中提供最重要概念的摘要。
 
-## Strategic concepts
+## 战略概念
 
-Strategic concepts are relatively high-level concepts that influence a system's design on a architectural level. It provides the concepts to design boundaries of components and the interaction between them. While they don't directly impact the design of an individual Axon application, the boundaries of such applications are often influenced by these concepts.
+战略概念是在体系结构层面上影响系统设计的相对高级的概念。它提供了设计组件边界和组件之间交互的概念。虽然它们不会直接影响单个Axon应用程序的设计，但这些应用程序的边界通常会受到这些概念的影响。
 
-### Domains and Subdomains
+### 域和子域
 
-The formal definition of a Domain in the context of DDD is:
+DDD中域的正式定义是：
 
-> A sphere of knowledge, influence, or activity. The subject area to which the user applies a program is the domain of the software.
+> 一个知识、影响或活动的领域。用户应用程序的主题区域是软件的领域.
 
-This definition may appear vague, but it does capture the essence very well. The domain is basically the environment in which you build your software. This environment consists of laws, best practices, expectations, traditions, etc, which define what is important and what is not.
+这个定义可能看起来很模糊，但它确实很好地抓住了本质。领域基本上就是构建软件的环境。这种环境由法律、最佳实践、预期、传统等组成，它们定义了什么是重要的，什么是不重要的。
 
-Domains can be very big and different areas within a domain might have different influences. For example, in the domain of banking, there is a clear difference between consumer banking, corporate banking and wealth management.
+领域可以很大，领域内的不同区域可能有不同的影响。例如，在银行业领域，消费者银行业务、公司银行业务和财富管理业务有着明显的区别。
 
-There are numerous techniques that can help you to discover a domain. [Event Storming](https://www.eventstorming.com/book/) is a particularly interesting one. It is a workshop format for quickly exploring complex business domains.
+有许多技术可以帮助您发现领域。[事件风暴](https://www.eventstorming.com/book/)是一个特别有趣的问题。它是一种用于快速探索复杂业务领域的研讨会形式。
 
-### Model
+### 模型
 
-A model is:
+模型是：
 
-> A system of abstractions that describes selected aspects of a domain and can be used to solve problems related to that domain;
+> 一种抽象系统，描述一个领域的某些方面，可以用来解决与该领域有关的问题；
 
-In other words, a model captures what's important and helpful to us in solving a specific problem within our domain. This definition in itself suggests that an application should consist of more than one model, as each problem has a different ideal model to address it.
+换句话说，一个模型捕获了在我们的领域内解决一个特定问题时对我们重要和有帮助的东西。这个定义本身就意味着一个应用程序应该由多个模型组成，因为每个问题都有一个不同的理想模型来解决它。
 
-See [Tactical Concepts](ddd-cqrs-concepts.md#tactical-concepts) for more information about some of the building blocks of a Model in Axon based applications.
+有关基于Axon的应用程序中模型的某些构建块的详细信息，请参见[战术概念](ddd-cqrs-concepts.md#tactical-concepts)。
+### 有界上下文
 
-### Bounded Context
+上下文是：
 
-A context is:
+> 一个词或语句出现的环境，决定其含义。
 
-> The setting in which a word or statement appears that determines its meaning.
+换言之，相同的领域概念对不同的人可能有不同的含义。
 
-In other words, the same domain concept may have a different meaning to different people.
+例如，考虑飞行的概念。对于乘客来说，航班是指从飞机起飞到到达目的地之间的一段时间。然而，地勤人员关心的是航班到达登机口的时间、登机所需的餐食、枕头等的数量，航班离开登机口时就已经完成了。对他们来说，出发时间是最后期限，而不是出发点。
 
-Consider, for example, the concept of a Flight. For a passenger, a Flight is the period between departure of an aircraft until the arrival at your destination. The Ground Crew, however, cares about the arrival of a Flight at the Gate, the number of meals, pillows, etc to get on board, and they're done when the flight leaves the gate. For them, departure time is a deadline, not the starting point.
+因此，模型和上下文有许多规则：
 
-Therefore, there are a number of rules for Models and Contexts:
 
-* Explicitly define the context within which a model applies.
-* Explicitly set boundaries in terms of team organization, usage within specific parts of the application, and physical manifestations such as code bases and database schemas.
-* Keep the model strictly consistent within these bounds, but don’t be distracted or confused by issues outside it.
+* 显式定义模型应用的上下文。
+* 根据团队组织、应用程序特定部分中的使用情况以及代码库和数据库模式等物理表现形式，显式地设置边界。
+* 在这些范围内保持模型的严格一致性，但不要被它之外的问题分散注意力或混淆。
 
-### Context Mapping
+### 上下文映射
 
-A bounded context never lives entirely on its own. Information from different contexts will eventually be synchronized. It is useful to model this interaction explicitly. Domain-Driven Design names a few relationships between contexts, which drive the way they interact:
+有界上下文永远不会完全独立存在。来自不同上下文的信息最终会被同步。对这种交互进行显式建模是很有用的。领域驱动设计命名了一些上下文之间的关系，这些关系驱动了它们的交互方式：
 
-* partnership \(two contexts/teams combine efforts to build interaction\)
-* customer-supplier \(two teams in upstream/downstream relationship - upstream can succeed independently of downstream team\)
-* conformist \(two teams in upstream/downstream relationship - upstream has no motivation to provide to downstream, and downstream team does not put effort in translation\)
-* shared kernel \(explicitly, sharing a part of the model\)
-* separate ways \(cut them loose\)
-* anti-corruption layer \(the downstream team builds a layer to prevent upstream design to 'leak' into their own models, by transforming interactions\)
+* partnership 合作 \(两个上下文/团队共同努力建立互动\)
+* customer-supplier 客户供应商 \(上游/下游关系中的两个团队-上游可以独立于下游团队取得成功\)
+* conformist 遵纪守法 \(处于上下游关系中的两个团队-上游没有向下游提供的动机，下游团队没有在转换上投入精力\)
+* shared kernel 共享内核 \(显式地，共享模型的一部分\)
+* separate ways 分道扬镳 \(分开它们\)
+* anti-corruption layer 反腐层 \(下游团队构建了一个层，通过转换交互来防止上游设计“泄漏”到他们自己的模型中\)
 
-In Axon based application, the context defines the boundary in which Events carry value. Some events may be valuable only in the context in which they are published, while others may be valuable even outside. The broader the scope in which an event \(or any message, in that respect\) is published, the more components end up coupling to the sender.
+在基于Axon的应用程序中，上下文定义了事件承载值的边界。有些事件可能只在其发布的上下文中才有价值，而有些事件甚至在外部也可能有价值。事件\(或任何消息，在这方面\)发布的范围越广，最终耦合到发送方的组件就越多。
 
-## Tactical concepts
+## 战术概念
 
-To build a model, DDD \(and CQRS to some extent as well\) provide a number of useful building blocks. Below are a few building blocks that are important in the context of Axon based applications.
+为了建立一个模型，DDD \(以及CQRS在某种程度上也是\) 提供了许多有用的构建块。下面是一些在基于Axon的应用程序上下文中非常重要的构建块。
 
-### Aggregates
+### 聚合
 
-An Aggregate is an entity or group of entities that is always kept in a consistent state \(within a single ACID transaction\). The Aggregate Root is the entity within the aggregate that is responsible for maintaining this consistent state. This makes the aggregate the prime building block for implementing a command model in any CQRS based application.
+聚合是始终保持一致状态\(在单个ACID事务中\)的实体或实体组。聚合根是聚合中负责维护此一致状态的实体。这使得聚合成为在任何基于CQRS的应用程序中实现命令模型的基本构建块。
 
-The formal definition, by DDD is:
+正式定义是：
 
-> A cluster of associated objects that are treated as a unit for the purpose of data changes. External references are restricted to one member of the Aggregate, designated as the root. A set of consistency rules applies within the Aggregate's boundaries.
+> 为进行数据更改而被视为一个单元的一组相关对象。外部引用仅限于聚合中指定为根的一个成员。在聚合的边界内应用一组一致性规则。
 
-In CQRS based applications, Aggregates are very explicitly present in the Command Model, as that is where change is initiated. However, Query Models / Projections are also built up of Aggregates. Generally, however, aggregates in Query Models are much more straightforward, as state invariants are generally less strict in those models.
+在基于CQRS的应用程序中，聚合非常明确地出现在命令模型中，因为这是发起更改的地方。然而，查询模型/预测也是由聚合建立的。然而，一般来说，查询模型中的聚合要简单得多，因为状态不变量在这些模型中通常不那么严格。
 
 ### Saga
 
-Not every command is able to completely execute in a single atomic transaction. A very common example that pops up quite often as an argument for transactions is the money transfer. It is often believed that an atomic and consistent transaction is absolutely required to transfer money from one account to another. Well, it is not. On the contrary, it is quite impossible to do. What if money is transferred from an account on bank A \(instance A of aggregate `BankAccount`\), to another account on bank B \(instance B of aggregate `BankAccount`\)? Does bank A acquire a lock in bank B's database? If the transfer is in progress, is it strange that bank A has deducted the amount, but bank B has not deposited it yet? Not really, it's "underway". On the other hand, if something goes wrong while depositing the money on bank B's account, bank A's customer would want his money back. So we do expect some form of consistency, eventually. Another example could be `GiftCardPaymentSaga` which would start once the order is placed \(`OrderPlacedEvent`\). It will make sure that once the gift card is successfully redeemed \(`CardRedeemedEvent`\), an order is confirmed \(`ConfirmGiftCardPaymentCommand`\) on the other side.
+不是每个命令都能在单个原子事务中完全执行。一个非常常见的例子，经常作为事务的一个论据出现，那就是资金转移。人们通常认为，将资金从一个账户转移到另一个账户绝对需要一个原子的、一致的交易。嗯，不是。相反，这是完全不可能做到的。如果资金从银行A(聚合`BankAccount`的实例A)的一个帐户转移到银行B(聚合`BankAccount`的实例B)的另一个帐户怎么办？银行A是否获得了银行B数据库中的锁？如果转账进行中，A银行扣了款，B银行还没存，是不是很奇怪？不是真的，它正在“进行中”。另一方面，如果把钱存入B银行的账户时出了问题，A银行的客户会想要拿回他的钱。因此，我们确实希望最终会有某种形式的一致性。另一个例子是`GiftCardPaymentSaga`，它将在下单（`OrderPlacedEvent`)后开始。它将确保在礼品卡成功兑换(`CardRedemedEvent`)后，在另一边确认订单(`ConfirmGiftCardPaymentCommand`)。
 
-While ACID transactions are not necessary or even impossible in some cases, some form of transaction management is still required. Typically, these transactions are referred to as BASE transactions: Basically Available, Soft state, Eventual consistency. Contrary to ACID, BASE transactions cannot be easily rolled back. To roll back, compensating actions need to be taken to revert anything that has occurred as part of the transaction. In the gift card example, a redeem failure of `GiftCard`, will reject the `Order` payment.
+虽然ACID事务在某些情况下不是必需的，甚至是不可能的，但是仍然需要某种形式的事务管理。通常，这些事务被称为基本事务：基本可用、软状态、最终一致性。与ACID相反，BASE事务不容易回滚。要回滚，需要采取补偿操作来还原作为事务一部分发生的任何内容。在礼品卡示例中，兑换失败`GiftCard`将拒绝`Order`付款。
 
-In CQRS, Sagas can be used to manage these BASE transactions. They respond to events and may dispatch commands, invoke external applications, etc. In the context of Domain-Driven Design, it is common for Sagas to be used as coordination mechanism between different aggregates \(or aggregate instances\) in order to eventually achieve consistency.
+在CQRS中，saga可以用来管理这些基本事务。它们对事件作出响应，并可能发送命令、调用外部应用程序等。在域驱动设计的上下文中，saga通常被用作不同聚合(或聚合实例)之间的协调机制，以便最终实现一致性。
+### 查看模型或投影
 
-### View Models or Projections
-
-In CQRS, View Models \(also known as Projections or Query Models\) are used to efficiently expose information about the application's state. Unlike Command Models, view models focus on data, rather than behavior. View models are generally modeled to accommodate information needs of a specific audience. These models should clearly express the intended audience of the model, to prevent 'distraction' and scope creep, which ultimately leads to loss of maintainability and even performance.
-
+在CQRS中，视图模型(也称为投影或查询模型)用于有效地公开有关应用程序状态的信息。与命令模型不同，视图模型关注的是数据，而不是行为。视图模型通常被建模以适应特定受众的信息需求。这些模型应该清楚地表达模型的目标受众，以防止“分心”和范围蔓延，最终导致可维护性甚至性能的损失。
